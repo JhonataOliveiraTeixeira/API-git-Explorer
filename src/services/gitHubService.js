@@ -1,4 +1,4 @@
-import axios from 'axios'
+const axios = require('axios')
 
 const BASE_URL = 'https://api.github.com'
 
@@ -33,4 +33,4 @@ const getRepositoriesFromUser = async (username) => {
     }
 }
 
-export { getUserFromGitHub, getRepositoriesFromUser, BASE_URL }
+module.exports = { getRepositoriesFromUser, getUserFromGitHub }
