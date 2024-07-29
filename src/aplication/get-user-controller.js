@@ -1,6 +1,6 @@
 const { getUserFromGitHub } = require("../services/gitHubService")
 
-async function getUser(req, res) {
+async function getUserRepositories(req, res) {
 
     const { username } = req.body
 
@@ -12,4 +12,4 @@ async function getUser(req, res) {
     }
 }
 
-module.exports = getUser
+module.exports = getUserRepositories
