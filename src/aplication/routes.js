@@ -1,9 +1,9 @@
-const express = require('express');
-const router = express.Router();
+const express = require('express')
+const router = express.Router()
 const getUserRepositories = require('./get-user-controller')
-const getRepository = require('./get-respositires-from-user');
+const fetchRepository = require('./fetch-repositories-from user')
 
 router.post('/api', getUserRepositories)
-router.get('/fetch-repository', getRepository)
+router.post('/fetch-repository', fetchRepository)
 
-module.exports = router;
+module.exports = router

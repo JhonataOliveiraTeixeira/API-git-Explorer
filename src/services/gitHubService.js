@@ -26,7 +26,7 @@ const getUserFromGitHub = async (username) => {
                 const response = await update(repoLinks, username)
                 return { Response: response }
             } else {
-                return { Response: 'repository already updated' }
+                return { Response: 'repository already updated', response: response }
             }
         } else {
             const response = await create(repoLinks, username)
@@ -43,10 +43,27 @@ const getUserFromGitHub = async (username) => {
     }
 }
 
-const getRepositoriesFromUser = async (username) => {
+const getRepositoriesFromUser = async (username, repoName) => {
     try {
-        const response = await axios.get(`${BASE_URL}/users/${username}/repos`)
-        return response.data
+        const userAlreadExist = await findByUser(username)
+        if (!userAlreadExist) {
+            throw new Error(`Usuário não encontrado`)
+        }
+
+        const repository = userAlreadExist.Repositories.find((repo) => repo.name === repoName)
+
+        if (!repository) {
+            throw new Error(`Repositorio não encontrado`)
+        }
+
+        return { Response: repository }
+
+
+
+
+
+
+
     } catch (error) {
         if (error.response) {
             throw new Error(`Erro ${error.response.status}: ${error.response.data.message}`)

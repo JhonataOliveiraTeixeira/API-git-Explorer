@@ -1,15 +1,15 @@
 const { getRepositoriesFromUser } = require("../services/gitHubService")
 
-async function getRepository(req, res) {
+async function fetchRepository(req, res) {
 
-    const { username } = req.body
+    const { username, repoName } = req.body
 
     try {
-        const result = await getRepositoriesFromUser(username)
+        const result = await getRepositoriesFromUser(username, repoName)
         res.status(200).json(result)
     } catch (error) {
         res.status(500).json({ message: error.message })
     }
 }
 
-module.exports = getRepository
+module.exports = fetchRepository
