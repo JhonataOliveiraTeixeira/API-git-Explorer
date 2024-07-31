@@ -1,5 +1,6 @@
 const axios = require('axios')
 const { create, findByUser, update } = require('../repositories/user-repository')
+const { redisUtils, fecthRegisData } = require('../utils/redis-utils')
 
 const BASE_URL = 'https://api.github.com'
 
@@ -14,6 +15,17 @@ const getUserFromGitHub = async (username) => {
             html_url: repo.html_url
         }))
 
+        const userExistInRegisDB = await fecthRegisData(username)
+
+        if (userExistInRegisDB) {
+            return { from: 'Regis Data Base', response: userExistInRegisDB }
+        } else {
+            await redisUtils(username, repoLinks)
+
+        }
+
+
+
         const userAlreadExist = await findByUser(username)
 
         if (userAlreadExist) {
@@ -26,7 +38,7 @@ const getUserFromGitHub = async (username) => {
                 const response = await update(repoLinks, username)
                 return { Response: response }
             } else {
-                return { Response: 'repository already updated' }
+                return { Response: 'repository already updated', response: response }
             }
         } else {
             const response = await create(repoLinks, username)
@@ -36,17 +48,34 @@ const getUserFromGitHub = async (username) => {
         if (error.response) {
             throw new Error(`Erro: ${error.response.status}`)
         } else if (error.request) {
-            throw new Error('Erro: Sem resposta do servidor')
+            throw new Error('Erro: Reponse server not recieve')
         } else {
             throw new Error(`Erro: ${error.message}`)
         }
     }
 }
 
-const getRepositoriesFromUser = async (username) => {
+const getRepositoriesFromUser = async (username, repoName) => {
     try {
-        const response = await axios.get(`${BASE_URL}/users/${username}/repos`)
-        return response.data
+        const userAlreadExist = await findByUser(username)
+        if (!userAlreadExist) {
+            throw new Error(`User not found`)
+        }
+
+        const repository = userAlreadExist.Repositories.find((repo) => repo.name === repoName)
+
+        if (!repository) {
+            throw new Error(`Repository not found`)
+        }
+
+        return { Response: repository }
+
+
+
+
+
+
+
     } catch (error) {
         if (error.response) {
             throw new Error(`Erro ${error.response.status}: ${error.response.data.message}`)
