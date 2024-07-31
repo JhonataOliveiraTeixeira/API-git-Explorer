@@ -1,5 +1,6 @@
 const axios = require('axios')
 const { create, findByUser, update } = require('../repositories/user-repository')
+const { redisUtils, fecthRegisData } = require('../utils/redis-utils')
 
 const BASE_URL = 'https://api.github.com'
 
@@ -13,6 +14,17 @@ const getUserFromGitHub = async (username) => {
             issuesOpen: repo.open_issues_count,
             html_url: repo.html_url
         }))
+
+        const userExistInRegisDB = await fecthRegisData(username)
+
+        if (userExistInRegisDB) {
+            return { from: 'Regis Data Base', response: userExistInRegisDB }
+        } else {
+            await redisUtils(username, repoLinks)
+
+        }
+
+
 
         const userAlreadExist = await findByUser(username)
 
@@ -36,7 +48,7 @@ const getUserFromGitHub = async (username) => {
         if (error.response) {
             throw new Error(`Erro: ${error.response.status}`)
         } else if (error.request) {
-            throw new Error('Erro: Sem resposta do servidor')
+            throw new Error('Erro: Reponse server not recieve')
         } else {
             throw new Error(`Erro: ${error.message}`)
         }
@@ -47,13 +59,13 @@ const getRepositoriesFromUser = async (username, repoName) => {
     try {
         const userAlreadExist = await findByUser(username)
         if (!userAlreadExist) {
-            throw new Error(`Usuário não encontrado`)
+            throw new Error(`User not found`)
         }
 
         const repository = userAlreadExist.Repositories.find((repo) => repo.name === repoName)
 
         if (!repository) {
-            throw new Error(`Repositorio não encontrado`)
+            throw new Error(`Repository not found`)
         }
 
         return { Response: repository }
