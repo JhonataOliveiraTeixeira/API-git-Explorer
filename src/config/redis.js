@@ -10,8 +10,6 @@ const connectRedis = async () => {
     try {
         await cliente.connect()
 
-        await cliente.flushDb()
-
         console.log('Connected to Redis')
     } catch (err) {
         console.error('Could not connect to Redis', err)
@@ -21,4 +19,4 @@ const connectRedis = async () => {
 
 connectRedis()
 
-module.exports = { cliente }
+module.exports = cliente 
